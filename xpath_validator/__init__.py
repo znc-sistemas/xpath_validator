@@ -85,12 +85,12 @@ __author__ = 'Marcelo Fonseca Tambalo'
 __version__ = '1.0.0'
 __license__ = 'MIT'
 
-from tokenize import tokenize
-from parse import parse
-
 import datetime
 
 from math import floor, ceil
+
+from xpath_validator.tokenize import tokenize
+from xpath_validator.parse import parse
 
 
 RETURNS_BOOL_AUTO = True
