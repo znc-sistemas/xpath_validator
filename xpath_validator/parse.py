@@ -2,7 +2,7 @@
     Based on http://www.tinypy.org/ code
 '''
 
-from .tokenize import clean, u_error
+from tokenize import clean, u_error
 
 
 def mktok(t, typ, val, itms=None):

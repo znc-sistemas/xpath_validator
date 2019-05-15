@@ -71,3 +71,15 @@ Examples
     False
     >>> validate('(. mod 2) = 0', 11)
     False
+    >>> validate("int(format-date-time(., '%H')) = 19", '2019-05-14T19:13:35.450686Z')
+    True
+    >>> validate("int(format-date-time(., '%m')) = 5", '2019-05-14T19:13:35.450686Z')
+    True
+    >>> validate("int(format-date-time(., '%M')) = 13", '2019-05-14T19:13:35.450686Z')
+    True
+    >>> validate("int(format-date-time(., '%Y')) = 2019", '2019-05-14T19:13:35.450686Z')
+    True
+    >>> validate("int(format-date-time(., '%d')) = 14", '2019-05-14T19:13:35.450686Z')
+    True
+    >>> validate("format-date-time(., '%d/%m/%Y') = '14/05/2019'", '2019-05-14T19:13:35.450686Z')
+    True
