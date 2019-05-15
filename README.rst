@@ -3,6 +3,12 @@ xpath_validator
 
 Validate boolean expressions with XPath syntax
 
+validate('expression', 'value', 'context')
+
+- expression: string with the expression text
+- value: value that will be validated (it is replaced by the occurrences of '.' in the expression)
+- context: dictionary that will make substitutions in $ {name}
+
 Examples
 --------
 
