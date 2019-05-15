@@ -1,4 +1,4 @@
-xpath_validator
+xpath_validator 
 ===============
 
 Validate boolean expressions with XPath syntax
