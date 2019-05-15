@@ -75,6 +75,10 @@ True
 True
 >>> validate("format-date-time(., '%d/%m/%Y') = '14/05/2019'", '2019-05-14T19:13:35.450686Z')
 True
+>>> validate('. >= ${min} and . <= ${max}', 10, {"max": 100, "min": 10})
+True
+>>> validate('. >= ${min} and . <= ${max}', 10, {"max": 100, "min": 20})
+False
 '''
 
 __author__ = 'Marcelo Fonseca Tambalo'
