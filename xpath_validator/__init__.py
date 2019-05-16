@@ -79,19 +79,27 @@ True
 True
 >>> validate('. >= ${min} and . <= ${max}', 10, {"max": 100, "min": 20})
 False
+>>> validate('${min} = "" and ${max} = ""', None, {"max": 100, "min": 20})
+False
 '''
 
 __author__ = 'Marcelo Fonseca Tambalo'
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 __license__ = 'MIT'
 
 import datetime
 
 from math import floor, ceil
 
-from xpath_validator.tokenize import tokenize
-from xpath_validator.parse import parse
+try:
+    from xpath_validator.tokenize import tokenize
+except ImportError:
+    from tokenize import tokenize
 
+try:
+    from xpath_validator.parse import parse
+except ImportError:
+    from parse import parse
 
 RETURNS_BOOL_AUTO = True
 
@@ -207,6 +215,8 @@ def _lsp_parse(program, data_node=''):
 
 def _lisp(t):
     if 'items' not in t:
+        if t['val'] == '':
+            return "''"
         return t['val']
     args = ''.join([" " + _lisp(tt) for tt in t['items']])
     return "(" + t['val'] + args + ")"
@@ -260,11 +270,9 @@ def validate(expression, data_node, context={}):
         expression,
         _prepare_ctx(context)
     )
-    return _xpath_boolean(
-        _lsp_parse(
-            _to_lsp(expression), data_node=data_node
-        )
-    )
+    lsp_code = _to_lsp(expression)
+    lsp_parsed = _lsp_parse(lsp_code, data_node=data_node)
+    return _xpath_boolean(lsp_parsed)
 
 
 if __name__ == "__main__":
