@@ -1,21 +1,21 @@
 '''
 validate boolean expressions with XPath syntax
 
->>> validate('. >= 1 and . <= 100', "10")
+>>> validate('. >= 1 and . <= 100', 10)
 True
->>> validate('. >= 1 and . <= 100', "101")
+>>> validate('. >= 1 and . <= 100', 101)
 False
->>> validate('not(. >= 1 and . <= 100)', "-10")
+>>> validate('not(. >= 1 and . <= 100)', -10)
 True
 >>> validate('ceiling(.) = 5', 4.3)
 True
->>> validate('floor(.) = 4', "4.7")
+>>> validate('floor(.) = 4', 4.7)
 True
->>> validate('floor(.) = 4', "4.2")
+>>> validate('floor(.) = 4', 4.2)
 True
->>> validate('int(.) = 4', "4.7")
+>>> validate('int(.) = 4', 4.7)
 True
->>> validate('number(.) = 3.2', "3.2")
+>>> validate('number(.) = 3.2', 3.2)
 True
 >>> validate('choose(true(), 1, 2) = 1', None)
 True
@@ -31,7 +31,7 @@ True
 True
 >>> validate('string_length(.) = 7', "abacate")
 True
->>> validate('5 < .', "10")
+>>> validate('5 < .', 10)
 True
 >>> validate('5 > .', 10)
 False
@@ -81,10 +81,12 @@ True
 False
 >>> validate('${min} = "" and ${max} = ""', None, {"max": 100, "min": 20})
 False
+>>> validate('string_length(.) = 11', "01258997853")
+True
 '''
 
 __author__ = 'Marcelo Fonseca Tambalo'
-__version__ = '1.0.2'
+__version__ = '1.0.3'
 __license__ = 'MIT'
 
 import datetime
@@ -196,12 +198,15 @@ def _lsp_atomize(tokens):
 def _lsp_parse(program, data_node=''):
     a = _lsp_atomize((program.replace(')', ' ) ').replace('(', ' ( ').split()))
 
+    if isinstance(data_node, str):
+        data_node = XPathStr(data_node)
+
     def replace_dot(atoms):
         for i, e in enumerate(atoms):
             if isinstance(e, list):
                 atoms[i] = replace_dot(e)
             elif e == '.':
-                atoms[i] = _lsp_atom(data_node)
+                atoms[i] = data_node
         return atoms
 
     return replace_dot(a)

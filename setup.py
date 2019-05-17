@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='xpath_validator',
     packages=['xpath_validator'],
-    version='1.0.2',
+    version='1.0.3',
     description='validate boolean expressions with XPath syntax',
     long_description=open('README.rst').read(),
     author='Marcelo Fonseca Tambalo',
