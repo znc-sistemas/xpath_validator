@@ -83,10 +83,12 @@ False
 False
 >>> validate('string_length(.) = 11', "01258997853")
 True
+>>> validate("number('') = 11", None)
+False
 '''
 
 __author__ = 'Marcelo Fonseca Tambalo'
-__version__ = '1.0.2'
+__version__ = '1.0.5'
 __license__ = 'MIT'
 
 import datetime
@@ -140,21 +142,41 @@ def _float(v):
         return float('nan')
 
 
+def _substring_after(x, y):
+    for i in range(len(x)):
+        if x[i] == y:
+            return x[i + 1:]
+    return ''
+
+
+def _substring_before(x, y):
+    for i in range(len(x)):
+        if x[i] == y:
+            return x[0:i]
+    return ''
+
+
 FUNCTIONS = {
+    'false': lambda: False,
+    'true': lambda: True,
     'boolean': bool,
     'not': lambda x: not bool(x),
+    'choose': lambda x, a, b: a if x else b,
+
     'ceiling': ceil,
     'floor': floor,
     'round': round,
     'int': _int,
     'number': _float,
-    'choose': lambda x, a, b: a if x else b,
+
     'contains': lambda x, y: y in x,
     'format_date_time': _format_date_time,
+    'normalize_space': str.strip,
+    'starts_with': str.startswith,
     'string': str,
     'string_length': len,
-    'false': lambda: False,
-    'true': lambda: True,
+    'substring_after': _substring_after,
+    'substring_before': _substring_before,
 }
 
 
