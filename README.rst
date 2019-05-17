@@ -14,22 +14,21 @@ Examples
 
 .. code-block:: python
     
-    >>> from xpath_validator import validate
-    >>> validate('. >= 1 and . <= 100', "10")
+    >>> validate('. >= 1 and . <= 100', 10)
     True
-    >>> validate('. >= 1 and . <= 100', "101")
+    >>> validate('. >= 1 and . <= 100', 101)
     False
-    >>> validate('not(. >= 1 and . <= 100)', "-10")
+    >>> validate('not(. >= 1 and . <= 100)', -10)
     True
     >>> validate('ceiling(.) = 5', 4.3)
     True
-    >>> validate('floor(.) = 4', "4.7")
+    >>> validate('floor(.) = 4', 4.7)
     True
-    >>> validate('floor(.) = 4', "4.2")
+    >>> validate('floor(.) = 4', 4.2)
     True
-    >>> validate('int(.) = 4', "4.7")
+    >>> validate('int(.) = 4', 4.7)
     True
-    >>> validate('number(.) = 3.2', "3.2")
+    >>> validate('number(.) = 3.2', 3.2)
     True
     >>> validate('choose(true(), 1, 2) = 1', None)
     True
@@ -45,7 +44,7 @@ Examples
     True
     >>> validate('string_length(.) = 7', "abacate")
     True
-    >>> validate('5 < .', "10")
+    >>> validate('5 < .', 10)
     True
     >>> validate('5 > .', 10)
     False
@@ -92,4 +91,10 @@ Examples
     >>> validate('. >= ${min} and . <= ${max}', 10, {"max": 100, "min": 10})
     True
     >>> validate('. >= ${min} and . <= ${max}', 10, {"max": 100, "min": 20})
+    False
+    >>> validate('${min} = "" and ${max} = ""', None, {"max": 100, "min": 20})
+    False
+    >>> validate('string_length(.) = 11', "01258997853")
+    True
+    >>> validate("number('') = 11", None)
     False
