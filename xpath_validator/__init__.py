@@ -84,22 +84,16 @@ False
 '''
 
 __author__ = 'Marcelo Fonseca Tambalo'
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 __license__ = 'MIT'
 
 import datetime
 
 from math import floor, ceil
 
-try:
-    from xpath_validator.tokenize import tokenize
-except ImportError:
-    from tokenize import tokenize
+from xpath_validator.xp_tokenize import tokenize
+from xpath_validator.xp_parse import parse
 
-try:
-    from xpath_validator.parse import parse
-except ImportError:
-    from parse import parse
 
 RETURNS_BOOL_AUTO = True
 
@@ -249,9 +243,9 @@ def _prepare_ctx(ctx):
     for d, v in ctx.items():
         if isinstance(v, str):
             if "'" in v:
-                v = "'%s'" % v
-            else:
                 v = '"%s"' % v
+            else:
+                v = "'%s'" % v
         new_ctx[d] = v
     return new_ctx
 

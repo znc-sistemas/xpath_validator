@@ -1,10 +1,8 @@
 '''
     Based on http://www.tinypy.org/ code
 '''
-try:
-    from xpath_validator.tokenize import clean, u_error
-except ImportError:
-    from tokenize import clean, u_error
+
+from xpath_validator.xp_tokenize import clean, u_error
 
 
 def mktok(t, typ, val, itms=None):
