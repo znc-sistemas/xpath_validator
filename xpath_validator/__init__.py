@@ -81,10 +81,24 @@ True
 False
 >>> validate('${min} = "" and ${max} = ""', None, {"max": 100, "min": 20})
 False
->>> validate('string_length(.) = 11', "01258997853")
+>>> validate('string-length(.) = 11', "01258997853")
 True
 >>> validate("number('') = 11", None)
 False
+>>> validate('normalize-space("   a ") = "a"', None)
+True
+>>> validate('starts-with("abacate", "a")', None)
+True
+>>> validate('starts-with("abacate", "b")', None)
+False
+>>> validate('substring-after("foo_bar", "_") = "bar"', None)
+True
+>>> validate('substring-before("foo_bar", "_") = "foo"', None)
+True
+>>> validate('boolean(substring-after("foo_bar", "j")) = false()', None)
+True
+>>> validate('boolean(substring-before("foo_bar", "j")) = false()', None)
+True
 '''
 
 __author__ = 'Marcelo Fonseca Tambalo'
