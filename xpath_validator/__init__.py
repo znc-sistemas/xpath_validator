@@ -86,7 +86,7 @@ True
 '''
 
 __author__ = 'Marcelo Fonseca Tambalo'
-__version__ = '1.0.3'
+__version__ = '1.0.2'
 __license__ = 'MIT'
 
 import datetime
@@ -126,10 +126,18 @@ def _format_date_time(sdt, format):
     ).strftime(format)
 
 
-def _string_length(x):
-    if isinstance(x, (float, int)):
-        return len(str(x).replace('.0', ''))
-    return len(x)
+def _int(v):
+    try:
+        return int(v)
+    except Exception:
+        return float('nan')
+
+
+def _float(v):
+    try:
+        return float(v)
+    except Exception:
+        return float('nan')
 
 
 FUNCTIONS = {
@@ -138,13 +146,13 @@ FUNCTIONS = {
     'ceiling': ceil,
     'floor': floor,
     'round': round,
-    'int': int,
-    'number': float,
+    'int': _int,
+    'number': _float,
     'choose': lambda x, a, b: a if x else b,
     'contains': lambda x, y: y in x,
     'format_date_time': _format_date_time,
     'string': str,
-    'string_length': _string_length,
+    'string_length': len,
     'false': lambda: False,
     'true': lambda: True,
 }
