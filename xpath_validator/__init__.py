@@ -99,10 +99,18 @@ True
 True
 >>> validate('boolean(substring-before("foo_bar", "j")) = false()', None)
 True
+>>> validate("int(format-date-time(., '%H')) = 19", '19:13:35')
+True
+>>> validate("int(format-date-time(., '%S')) = 35", '19:13:35')
+True
+>>> validate("int(format-date-time(., '%H')) = 19", '19:13')
+True
+>>> validate("int(format-date-time(., '%M')) = 13", '19:13')
+True
 '''
 
 __author__ = 'Marcelo Fonseca Tambalo'
-__version__ = '1.0.5'
+__version__ = '1.1.0'
 __license__ = 'MIT'
 
 import datetime
@@ -136,10 +144,36 @@ class XPathStr(str):
         return XPathStr(super(XPathStr, self).__mul__(other))
 
 
+DATE_TIME_FORMATS = [
+    '%Y-%m-%dT%H:%M:%S.%fZ',  # '1991/25/10T14:30:59.243860Z'
+    '%Y-%m-%dT%H:%M:%S.%f',   # '1991/25/10T14:30:59.243860'
+    '%d/%m/%Y %H:%M:%S',      # '25/10/1991 14:30:59'
+    '%Y-%m-%d %H:%M:%S',      # '2006-10-25 14:30:59'
+    '%Y-%m-%d %H:%M:%S.%f',   # '2006-10-25 14:30:59.000200'
+    '%Y-%m-%d %H:%M',         # '2006-10-25 14:30'
+    '%Y-%m-%d',               # '2006-10-25'
+    '%m/%d/%Y %H:%M:%S',      # '10/25/2006 14:30:59'
+    '%m/%d/%Y %H:%M:%S.%f',   # '10/25/2006 14:30:59.000200'
+    '%m/%d/%Y %H:%M',         # '10/25/2006 14:30'
+    '%m/%d/%Y',               # '10/25/2006'
+    '%m/%d/%y %H:%M:%S',      # '10/25/06 14:30:59'
+    '%m/%d/%y %H:%M:%S.%f',   # '10/25/06 14:30:59.000200'
+    '%m/%d/%y %H:%M',         # '10/25/06 14:30'
+    '%m/%d/%y',               # '10/25/06'
+    '%H:%M',                  # '14:30:59'
+    '%H:%M:%S',               # '14:30'
+]
+
+
 def _format_date_time(sdt, format):
-    return datetime.datetime.strptime(
-        sdt, "%Y-%m-%dT%H:%M:%S.%fZ"
-    ).strftime(format)
+    for f in DATE_TIME_FORMATS:
+        try:
+            return datetime.datetime.strptime(
+                sdt, f
+            ).strftime(format)
+        except Exception:
+            pass
+    return None
 
 
 def _int(v):
