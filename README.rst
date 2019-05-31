@@ -7,6 +7,9 @@ xpath_validator
 .. image:: https://coveralls.io/repos/github/znc-sistemas/xpath_validator/badge.svg?branch=master
     :target: https://coveralls.io/github/znc-sistemas/xpath_validator?branch=master
 
+.. image:: https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square
+    :target: https://raw.githubusercontent.com/znc-sistemas/xpath_validator/master/LICENSE.txt
+    :alt: Package license
 
 Validate boolean expressions with XPath syntax
 
