@@ -4,6 +4,10 @@ xpath_validator
 .. image:: https://travis-ci.org/znc-sistemas/xpath_validator.svg?branch=master
     :target: https://travis-ci.org/znc-sistemas/xpath_validator
 
+.. image:: https://coveralls.io/repos/github/znc-sistemas/xpath_validator/badge.svg?branch=master
+:target: https://coveralls.io/github/znc-sistemas/xpath_validator?branch=master
+
+
 Validate boolean expressions with XPath syntax
 
 validate('expression', 'value', 'context')
