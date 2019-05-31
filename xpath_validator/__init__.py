@@ -81,6 +81,16 @@ True
 False
 >>> validate('${min} = "" and ${max} = ""', None, {"max": 100, "min": 20})
 False
+>>> validate("substring-after('aa&bb', ${sep}) = 'bb'", "&", {'sep': '&'})
+True
+>>> validate("substring-before('aa&bb', ${sep}) = 'aa'", "&", {'sep': '&'})
+True
+>>> validate("normalize-space('    abacate ') = 'abacate'", None)
+True
+>>> validate("starts-with('abacate', 'ab')", None)
+True
+>>> validate("starts-with('abacate', 'ac')", None)
+False
 '''
 
 __author__ = 'Marcelo Fonseca Tambalo'
