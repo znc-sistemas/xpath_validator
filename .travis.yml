@@ -4,5 +4,9 @@ python:
 cache: pip
 install:
   - pip install pytest
+  - pip install pytest-cov
 script:
-  - pytest --doctest-modules xpath_validator
+  - pytest --cov=xpath_validator --doctest-modules xpath_validator
+after_success:
+  - pip install coveralls
+  - coveralls
