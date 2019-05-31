@@ -1,6 +1,9 @@
 xpath_validator 
 ===============
 
+.. image:: https://travis-ci.org/znc-sistemas/xpath_validator.svg?branch=master
+    :target: https://travis-ci.org/znc-sistemas/xpath_validator
+
 Validate boolean expressions with XPath syntax
 
 validate('expression', 'value', 'context')
