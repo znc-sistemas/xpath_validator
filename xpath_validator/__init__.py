@@ -1,20 +1,14 @@
 __author__ = 'Marcelo Fonseca Tambalo'
-__version__ = '1.0.1'
+__version__ = '1.1.0'
 __license__ = 'MIT'
 
 import datetime
 
 from math import floor, ceil
 
-try:
-    from xpath_validator.tokenize import tokenize
-except ImportError:
-    from tokenize import tokenize
+from xpath_validator.xp_tokenize import tokenize
+from xpath_validator.xp_parse import parse
 
-try:
-    from xpath_validator.parse import parse
-except ImportError:
-    from parse import parse
 
 RETURNS_BOOL_AUTO = True
 
@@ -39,33 +33,87 @@ class XPathStr(str):
         return XPathStr(super(XPathStr, self).__mul__(other))
 
 
+DATE_TIME_FORMATS = [
+    '%Y-%m-%dT%H:%M:%S.%fZ',  # '1991/25/10T14:30:59.243860Z'
+    '%Y-%m-%dT%H:%M:%S.%f',   # '1991/25/10T14:30:59.243860'
+    '%d/%m/%Y %H:%M:%S',      # '25/10/1991 14:30:59'
+    '%Y-%m-%d %H:%M:%S',      # '2006-10-25 14:30:59'
+    '%Y-%m-%d %H:%M:%S.%f',   # '2006-10-25 14:30:59.000200'
+    '%Y-%m-%d %H:%M',         # '2006-10-25 14:30'
+    '%Y-%m-%d',               # '2006-10-25'
+    '%m/%d/%Y %H:%M:%S',      # '10/25/2006 14:30:59'
+    '%m/%d/%Y %H:%M:%S.%f',   # '10/25/2006 14:30:59.000200'
+    '%m/%d/%Y %H:%M',         # '10/25/2006 14:30'
+    '%m/%d/%Y',               # '10/25/2006'
+    '%m/%d/%y %H:%M:%S',      # '10/25/06 14:30:59'
+    '%m/%d/%y %H:%M:%S.%f',   # '10/25/06 14:30:59.000200'
+    '%m/%d/%y %H:%M',         # '10/25/06 14:30'
+    '%m/%d/%y',               # '10/25/06'
+    '%H:%M',                  # '14:30:59'
+    '%H:%M:%S',               # '14:30'
+]
+
+
 def _format_date_time(sdt, format):
-    return datetime.datetime.strptime(
-        sdt, "%Y-%m-%dT%H:%M:%S.%fZ"
-    ).strftime(format)
+    for f in DATE_TIME_FORMATS:
+        try:
+            return datetime.datetime.strptime(
+                sdt, f
+            ).strftime(format)
+        except Exception:
+            pass
+    return None
 
 
-def _string_length(x):
-    if isinstance(x, (float, int)):
-        return len(str(x).replace('.0', ''))
-    return len(x)
+def _int(v):
+    try:
+        return int(v)
+    except Exception:
+        return float('nan')
+
+
+def _float(v):
+    try:
+        return float(v)
+    except Exception:
+        return float('nan')
+
+
+def _substring_after(x, y):
+    for i in range(len(x)):
+        if x[i] == y:
+            return x[i + 1:]
+    return ''
+
+
+def _substring_before(x, y):
+    for i in range(len(x)):
+        if x[i] == y:
+            return x[0:i]
+    return ''
 
 
 FUNCTIONS = {
+    'false': lambda: False,
+    'true': lambda: True,
     'boolean': bool,
     'not': lambda x: not bool(x),
+    'choose': lambda x, a, b: a if x else b,
+
     'ceiling': ceil,
     'floor': floor,
     'round': round,
-    'int': int,
-    'number': float,
-    'choose': lambda x, a, b: a if x else b,
+    'int': _int,
+    'number': _float,
+
     'contains': lambda x, y: y in x,
     'format_date_time': _format_date_time,
+    'normalize_space': str.strip,
+    'starts_with': str.startswith,
     'string': str,
-    'string_length': _string_length,
-    'false': lambda: False,
-    'true': lambda: True,
+    'string_length': len,
+    'substring_after': _substring_after,
+    'substring_before': _substring_before,
 }
 
 
@@ -117,12 +165,15 @@ def _lsp_atomize(tokens):
 def _lsp_parse(program, data_node=''):
     a = _lsp_atomize((program.replace(')', ' ) ').replace('(', ' ( ').split()))
 
+    if isinstance(data_node, str):
+        data_node = XPathStr(data_node)
+
     def replace_dot(atoms):
         for i, e in enumerate(atoms):
             if isinstance(e, list):
                 atoms[i] = replace_dot(e)
             elif e == '.':
-                atoms[i] = _lsp_atom(data_node)
+                atoms[i] = data_node
         return atoms
 
     return replace_dot(a)
@@ -164,9 +215,9 @@ def _prepare_ctx(ctx):
     for d, v in ctx.items():
         if isinstance(v, str):
             if "'" in v:
-                v = "'%s'" % v
-            else:
                 v = '"%s"' % v
+            else:
+                v = "'%s'" % v
         new_ctx[d] = v
     return new_ctx
 
