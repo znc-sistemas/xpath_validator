@@ -1,21 +1,21 @@
 '''
 validate boolean expressions with XPath syntax
 
->>> validate('. >= 1 and . <= 100', "10")
+>>> validate('. >= 1 and . <= 100', 10)
 True
->>> validate('. >= 1 and . <= 100', "101")
+>>> validate('. >= 1 and . <= 100', 101)
 False
->>> validate('not(. >= 1 and . <= 100)', "-10")
+>>> validate('not(. >= 1 and . <= 100)', -10)
 True
 >>> validate('ceiling(.) = 5', 4.3)
 True
->>> validate('floor(.) = 4', "4.7")
+>>> validate('floor(.) = 4', 4.7)
 True
->>> validate('floor(.) = 4', "4.2")
+>>> validate('floor(.) = 4', 4.2)
 True
->>> validate('int(.) = 4', "4.7")
+>>> validate('int(.) = 4', 4.7)
 True
->>> validate('number(.) = 3.2', "3.2")
+>>> validate('number(.) = 3.2', 3.2)
 True
 >>> validate('choose(true(), 1, 2) = 1', None)
 True
@@ -31,7 +31,7 @@ True
 True
 >>> validate('string_length(.) = 7', "abacate")
 True
->>> validate('5 < .', "10")
+>>> validate('5 < .', 10)
 True
 >>> validate('5 > .', 10)
 False
