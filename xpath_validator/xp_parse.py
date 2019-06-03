@@ -99,31 +99,6 @@ def infix_led(t, left):
     return t
 
 
-def infix_is(t, left):
-    if check(P.token, 'not'):
-        t['val'] = 'isnot'
-        advance('not')
-    t['items'] = [left, expression(t['bp'])]
-    return t
-
-
-def infix_not(t, left):
-    advance('in')
-    t['val'] = 'notin'
-    t['items'] = [left, expression(t['bp'])]
-    return t
-
-
-def infix_tuple(t, left):
-    r = expression(t['bp'])
-    if left['val'] == ',':
-        left['items'].append(r)
-        return left
-    t['items'] = [left, r]
-    t['type'] = 'tuple'
-    return t
-
-
 def call_led(t, left):
     r = mktok(t, 'call', '$', [left])
     while not check(P.token, ')'):
@@ -152,15 +127,6 @@ def advance(t=None):
     return P.advance(t)
 
 
-def prefix_neg(t):
-    r = expression(50)
-    if r['type'] == 'number':
-        r['val'] = str(-float(r['val']))
-        return r
-    t['items'] = [mktok(t, 'number', '0'), r]
-    return t
-
-
 def vargs_nud(t):
     t['type'] = 'var'
     t['val'] = '.'
@@ -181,12 +147,10 @@ base_dmap = {
           'lbp': 50,
           'led': infix_led},
     ',': {'bp': 20,
-          'lbp': 20,
-          'led': infix_tuple},
+          'lbp': 20},
     '-': {'bp': 50,
           'lbp': 50,
-          'led': infix_led,
-          'nud': prefix_neg},
+          'led': infix_led},
     '.': {'nud': vargs_nud},
     '<': {'bp': 40,
           'lbp': 40,

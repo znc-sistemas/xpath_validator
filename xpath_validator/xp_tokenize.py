@@ -131,25 +131,12 @@ def do_name(s, i, l):
 
 def do_string(s, i, l):
     v, q, i = '', s[i], i + 1
-    if (l - i) >= 5 and s[i] == q and s[i + 1] == q:
-        i += 2
-        while i < l - 2:
-            c = s[i]
-            if c == q and s[i + 1] == q and s[i + 2] == q:
-                i += 3
-                T.add('string', v)
-                break
-            else:
-                v, i = v + c, i + 1
-                if c == '\n':
-                    T.y, T.yi = T.y + 1, i
-    else:
-        while i < l:
-            c = s[i]
-            if c == q:
-                i += 1
-                T.add('string', v)
-                break
-            else:
-                v, i = v + c, i + 1
+    while i < l:
+        c = s[i]
+        if c == q:
+            i += 1
+            T.add('string', v)
+            break
+        else:
+            v, i = v + c, i + 1
     return i
