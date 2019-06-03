@@ -91,7 +91,7 @@ True
 True
 >>> validate("starts-with('abacate', 'ac')", None)
 False
->>> XPathStr('aa_bb') / '_'
+>>> list(XPathStr('aa_bb') / '_')
 ['aa', 'bb']
 >>> XPathStr('aa_bb') - '_'
 'aabb'
