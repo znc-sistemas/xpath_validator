@@ -91,6 +91,14 @@ True
 True
 >>> validate("starts-with('abacate', 'ac')", None)
 False
+>>> XPathStr('aa_bb') / '_'
+['aa', 'bb']
+>>> XPathStr('aa_bb') - '_'
+'aabb'
+>>> XPathStr('aa_bb') + '_cc'
+'aa_bb_cc'
+>>> XPathStr('aa_bb') * 2
+'aa_bbaa_bb'
 '''
 
 __author__ = 'Marcelo Fonseca Tambalo'
