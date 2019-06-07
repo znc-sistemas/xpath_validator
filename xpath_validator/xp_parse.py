@@ -1,23 +1,23 @@
-'''
+"""
     Based on http://www.tinypy.org/ code
-'''
+"""
 
 from xpath_validator.xp_tokenize import clean, u_error
 
 
 def mktok(t, typ, val, itms=None):
-    r = {'from': t['from'], 'type': typ, 'val': val}
+    r = {"from": t["from"], "type": typ, "val": val}
     if itms is not None:
-        r['items'] = itms
+        r["items"] = itms
     return r
 
 
 def check(t, *vs):
     if vs[0] is None:
         return True
-    if t['type'] in vs:
+    if t["type"] in vs:
         return True
-    if t['type'] == 'symbol' and t['val'] in vs:
+    if t["type"] == "symbol" and t["val"] in vs:
         return True
     return False
 
@@ -27,7 +27,7 @@ def tweak(k, v):
     if v:
         dmap[k] = omap[k]
     else:
-        dmap[k] = {'lbp': 0, 'nud': itself}
+        dmap[k] = {"lbp": 0, "nud": itself}
 
 
 def restore():
@@ -51,36 +51,36 @@ class PData:
 
     def advance(self, val=None):
         if not check(self.token, val):
-            error('expected ' + val, self.token)
+            error("expected " + val, self.token)
         if self.pos < len(self.tokens):
             t = self.tokens[self.pos]
             self.pos += 1
         else:
-            t = {'from': (0, 0), 'type': 'eof', 'val': 'eof'}
+            t = {"from": (0, 0), "type": "eof", "val": "eof"}
         self.token = do(t)
         return t
 
 
 def error(ctx, t):
-    u_error(ctx, P.s, t['from'])
+    u_error(ctx, P.s, t["from"])
 
 
 def nud(t):
-    if 'nud' not in t:
-        error('no nud', t)
-    return t['nud'](t)
+    if "nud" not in t:
+        error("no nud", t)
+    return t["nud"](t)
 
 
 def led(t, left):
-    if 'led' not in t:
-        error('no led', t)
-    return t['led'](t, left)
+    if "led" not in t:
+        error("no led", t)
+    return t["led"](t, left)
 
 
 def get_lbp(t):
-    if 'lbp' not in t:
-        error('no lbp', t)
-    return t['lbp']
+    if "lbp" not in t:
+        error("no lbp", t)
+    return t["lbp"]
 
 
 def expression(rbp):
@@ -95,17 +95,17 @@ def expression(rbp):
 
 
 def infix_led(t, left):
-    t['items'] = [left, expression(t['bp'])]
+    t["items"] = [left, expression(t["bp"])]
     return t
 
 
 def call_led(t, left):
-    r = mktok(t, 'call', '$', [left])
-    while not check(P.token, ')'):
-        tweak(',', 0)
-        r['items'].append(expression(0))
-        if P.token['val'] == ',':
-            advance(',')
+    r = mktok(t, "call", "$", [left])
+    while not check(P.token, ")"):
+        tweak(",", 0)
+        r["items"].append(expression(0))
+        if P.token["val"] == ",":
+            advance(",")
         restore()
     advance(")")
     return r
@@ -116,10 +116,10 @@ def itself(t):
 
 
 def paren_nud(t):
-    tweak(',', 1)
+    tweak(",", 1)
     r = expression(0)
     restore()
-    advance(')')
+    advance(")")
     return r
 
 
@@ -128,72 +128,34 @@ def advance(t=None):
 
 
 def vargs_nud(t):
-    t['type'] = 'var'
-    t['val'] = '.'
+    t["type"] = "var"
+    t["val"] = "."
     return t
 
 
 base_dmap = {
-    '!=': {'bp': 40,
-           'lbp': 40,
-           'led': infix_led},
-    '(': {'bp': 80,
-          'lbp': 70,
-          'led': call_led,
-          'nud': paren_nud},
-    ')': {'lbp': 0,
-          'nud': itself},
-    '+': {'bp': 50,
-          'lbp': 50,
-          'led': infix_led},
-    ',': {'bp': 20,
-          'lbp': 20},
-    '-': {'bp': 50,
-          'lbp': 50,
-          'led': infix_led},
-    '.': {'nud': vargs_nud},
-    '<': {'bp': 40,
-          'lbp': 40,
-          'led': infix_led},
-    '<=': {'bp': 40,
-           'lbp': 40,
-           'led': infix_led},
-    '=': {'bp': 40,
-          'lbp': 40,
-          'led': infix_led},
-    '>': {'bp': 40,
-          'lbp': 40,
-          'led': infix_led},
-    '>=': {'bp': 40,
-           'lbp': 40,
-           'led': infix_led},
-    'and': {'bp': 31,
-            'lbp': 31,
-            'led': infix_led},
-    'or': {'bp': 30,
-           'lbp': 30,
-           'led': infix_led},
-    'div': {'bp': 60,
-            'lbp': 60,
-            'led': infix_led},
-    '*': {'bp': 60,
-          'lbp': 60,
-          'led': infix_led},
-    'mod': {'bp': 60,
-            'lbp': 60,
-            'led': infix_led},
-    'eof': {'lbp': 0,
-            'type': 'eof',
-            'val': 'eof'},
-    'name': {'lbp': 0,
-             'nud': itself},
-    'nl': {'lbp': 0,
-           'nud': itself,
-           'val': 'nl'},
-    'number': {'lbp': 0,
-               'nud': itself},
-    'string': {'lbp': 0,
-               'nud': itself},
+    "!=": {"bp": 40, "lbp": 40, "led": infix_led},
+    "(": {"bp": 80, "lbp": 70, "led": call_led, "nud": paren_nud},
+    ")": {"lbp": 0, "nud": itself},
+    "+": {"bp": 50, "lbp": 50, "led": infix_led},
+    ",": {"bp": 20, "lbp": 20},
+    "-": {"bp": 50, "lbp": 50, "led": infix_led},
+    ".": {"nud": vargs_nud},
+    "<": {"bp": 40, "lbp": 40, "led": infix_led},
+    "<=": {"bp": 40, "lbp": 40, "led": infix_led},
+    "=": {"bp": 40, "lbp": 40, "led": infix_led},
+    ">": {"bp": 40, "lbp": 40, "led": infix_led},
+    ">=": {"bp": 40, "lbp": 40, "led": infix_led},
+    "and": {"bp": 31, "lbp": 31, "led": infix_led},
+    "or": {"bp": 30, "lbp": 30, "led": infix_led},
+    "div": {"bp": 60, "lbp": 60, "led": infix_led},
+    "*": {"bp": 60, "lbp": 60, "led": infix_led},
+    "mod": {"bp": 60, "lbp": 60, "led": infix_led},
+    "eof": {"lbp": 0, "type": "eof", "val": "eof"},
+    "name": {"lbp": 0, "nud": itself},
+    "nl": {"lbp": 0, "nud": itself, "val": "nl"},
+    "number": {"lbp": 0, "nud": itself},
+    "string": {"lbp": 0, "nud": itself},
 }
 
 
@@ -204,10 +166,10 @@ def gmap(t, v):
 
 
 def do(t):
-    if t['type'] == 'symbol':
-        r = gmap(t, t['val'])
+    if t["type"] == "symbol":
+        r = gmap(t, t["val"])
     else:
-        r = gmap(t, t['type'])
+        r = gmap(t, t["type"])
     for k in r:
         t[k] = r[k]
     return t
@@ -216,10 +178,10 @@ def do(t):
 def do_module():
     tok = P.token
     items = []
-    while not check(P.token, 'eof'):
+    while not check(P.token, "eof"):
         items.append(expression(0))
     if len(items) > 1:
-        return mktok(tok, 'statements', ';', items)
+        return mktok(tok, "statements", ";", items)
     return items.pop()
 
 
