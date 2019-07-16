@@ -13,11 +13,12 @@ xpath_validator
 
 Validate boolean expressions with XPath syntax
 
-validate('expression', 'value', 'context')
+validate('expression', 'value', 'context', 'returns_bool')
 
 - expression: string with the expression text
 - value: value that will be validated (it is replaced by the occurrences of '.' in the expression)
 - context: dictionary that will make substitutions in $ {name}
+- returns_bool: if true, automatically returns a boolean
 
 Examples
 --------
@@ -114,3 +115,5 @@ Examples
     True
     >>> validate("starts-with('abacate', 'ac')", None)
     False
+    >>> validate("uuid()", None, returns_bool=False)
+    2327c8bc-ac46-4968-a73c-5f21f9e9b1ce
