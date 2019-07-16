@@ -99,6 +99,11 @@ False
 'aa_bb_cc'
 >>> XPathStr('aa_bb') * 2
 'aa_bbaa_bb'
+>>> import re
+>>> regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
+>>> match = regex.match(validate("uuid()", None, returns_bool=False))
+>>> bool(match)
+True
 """
 
 __author__ = "Marcelo Fonseca Tambalo"
@@ -106,6 +111,7 @@ __version__ = "1.1.0"
 __license__ = "MIT"
 
 import datetime
+import uuid
 
 from math import floor, ceil
 
@@ -194,6 +200,10 @@ def _substring_before(x, y):
     return ""
 
 
+def _uuid():
+    return str(uuid.uuid4())
+
+
 FUNCTIONS = {
     "false": lambda: False,
     "true": lambda: True,
@@ -213,6 +223,7 @@ FUNCTIONS = {
     "string_length": len,
     "substring_after": _substring_after,
     "substring_before": _substring_before,
+    "uuid": _uuid,
 }
 
 
@@ -287,8 +298,8 @@ def _lisp(t):
     return "(" + t["val"] + args + ")"
 
 
-def _to_lsp(code):
-    if not code.startswith("boolean") and RETURNS_BOOL_AUTO:
+def _to_lsp(code, returns_bool):
+    if not code.startswith("boolean") and returns_bool:
         code = "boolean(%s)" % code
     tokens = tokenize(code)
     tree = parse(code, tokens)
@@ -325,8 +336,8 @@ def _prepare_expression(exp, data):
     return exp
 
 
-def validate(expression, data_node, context={}):
+def validate(expression, data_node, context={}, returns_bool=RETURNS_BOOL_AUTO):
     expression = _prepare_expression(expression, _prepare_ctx(context))
-    lsp_code = _to_lsp(expression)
+    lsp_code = _to_lsp(expression, returns_bool=returns_bool)
     lsp_parsed = _lsp_parse(lsp_code, data_node=data_node)
     return _xpath_boolean(lsp_parsed)
