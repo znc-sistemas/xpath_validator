@@ -29,6 +29,8 @@ False
 True
 >>> validate('string_length(.) = 11', "40258997853")
 True
+>>> validate('string-length(.) = 11', "40258997853")
+True
 >>> validate('string_length(.) = 7', "abacate")
 True
 >>> validate('5 < .', 10)

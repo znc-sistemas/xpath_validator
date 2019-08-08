@@ -51,6 +51,8 @@ Examples
     False
     >>> validate('number(string(.)) = 6', 6)
     True
+    >>> validate('string-length(.) = 15', "632587415222360")
+    True
     >>> validate('string_length(.) = 11', "40258997853")
     True
     >>> validate('string_length(.) = 7', "abacate")
