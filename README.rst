@@ -117,3 +117,5 @@ Examples
     False
     >>> validate("uuid()", None, returns_bool=False)
     '2327c8bc-ac46-4968-a73c-5f21f9e9b1ce'
+    >>> validate('(. div -5)', 10, returns_bool=False)
+    -2.0
