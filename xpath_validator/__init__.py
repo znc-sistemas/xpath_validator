@@ -1,4 +1,4 @@
-"""
+r"""
 validate boolean expressions with XPath syntax
 
 >>> validate('. >= 1 and . <= 100', 10)
@@ -100,10 +100,12 @@ False
 >>> XPathStr('aa_bb') * 2
 'aa_bbaa_bb'
 >>> import re
->>> regex = re.compile('^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
+>>> regex = re.compile(r'^[a-f0-9]{8}-?[a-f0-9]{4}-?4[a-f0-9]{3}-?[89ab][a-f0-9]{3}-?[a-f0-9]{12}\Z', re.I)
 >>> match = regex.match(validate("uuid()", None, returns_bool=False))
 >>> bool(match)
 True
+>>> validate('(. div -5)', 10, returns_bool=False)
+-2.0
 """
 
 __author__ = "Marcelo Fonseca Tambalo"

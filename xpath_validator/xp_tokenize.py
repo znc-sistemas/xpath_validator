@@ -68,11 +68,12 @@ def do_tokenize(s):
     T.f = (T.y, i - T.yi + 1)
     while i < l:
         c = s[i]
+        n = s[i + 1] if i < l - 1 else ''
         T.f = (T.y, i - T.yi + 1)
-        if c in ISYMBOLS:
-            i = do_symbol(s, i, l)
-        elif c >= "0" and c <= "9":
+        if (c == '-' and n >= "0" and n <= "9") or (c >= "0" and c <= "9"):
             i = do_number(s, i, l)
+        elif c in ISYMBOLS:
+            i = do_symbol(s, i, l)
         elif (c >= "a" and c <= "z") or (c >= "A" and c <= "Z") or c == "_":
             i = do_name(s, i, l)
         elif c == '"' or c == "'":
@@ -113,7 +114,7 @@ def do_number(s, i, l):
     v, i, c = s[i], i + 1, s[i]
     while i < l:
         c = s[i]
-        if (c < "0" or c > "9") and (c < "a" or c > "f") and c != "x":
+        if c != '-' and (c < "0" or c > "9") and (c < "a" or c > "f") and c != "x":
             break
         v, i = v + c, i + 1
     if c == ".":
