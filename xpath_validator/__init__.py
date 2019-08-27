@@ -108,10 +108,14 @@ False
 True
 >>> validate('(. div -5)', 10, returns_bool=False)
 -2.0
+>>> validate("selected('peixe abacate', .)", 'peixe')
+True
+>>> validate("selected('peixe abacate', 'peixe')", None)
+True
 """
 
 __author__ = "Marcelo Fonseca Tambalo"
-__version__ = "1.1.1"
+__version__ = "1.5.0"
 __license__ = "MIT"
 
 import datetime
@@ -154,20 +158,48 @@ DATE_TIME_FORMATS = [
     "%Y-%m-%d %H:%M:%S.%f",  # '2006-10-25 14:30:59.000200'
     "%Y-%m-%d %H:%M",  # '2006-10-25 14:30'
     "%Y-%m-%d",  # '2006-10-25'
-    "%m/%d/%Y %H:%M:%S",  # '10/25/2006 14:30:59'
-    "%m/%d/%Y %H:%M:%S.%f",  # '10/25/2006 14:30:59.000200'
-    "%m/%d/%Y %H:%M",  # '10/25/2006 14:30'
-    "%m/%d/%Y",  # '10/25/2006'
-    "%m/%d/%y %H:%M:%S",  # '10/25/06 14:30:59'
-    "%m/%d/%y %H:%M:%S.%f",  # '10/25/06 14:30:59.000200'
-    "%m/%d/%y %H:%M",  # '10/25/06 14:30'
-    "%m/%d/%y",  # '10/25/06'
+    "%d/%m/%Y %H:%M:%S",  # '10/25/2006 14:30:59'
+    "%d/%m/%Y %H:%M:%S.%f",  # '10/25/2006 14:30:59.000200'
+    "%d/%m/%Y %H:%M",  # '10/25/2006 14:30'
+    "%d/%m/%Y",  # '10/25/2006'
+    "%d/%m/%y %H:%M:%S",  # '10/25/06 14:30:59'
+    "%d/%m/%y %H:%M:%S.%f",  # '10/25/06 14:30:59.000200'
+    "%d/%m/%y %H:%M",  # '10/25/06 14:30'
+    "%d/%m/%y",  # '10/25/06'
     "%H:%M",  # '14:30:59'
     "%H:%M:%S",  # '14:30'
 ]
 
 
 def _format_date_time(sdt, format):
+    """
+    >>> _format_date_time('2019-05-14T19:13:35.450686Z', '%H')
+    '19'
+    >>> _format_date_time('2019-05-14T19:13:35.450686', '%H')
+    '19'
+    >>> _format_date_time('2019-05-14 19:13:35', '%H')
+    '19'
+    >>> _format_date_time('14/05/2018 19:13:35', '%H')
+    '19'
+    >>> _format_date_time('2019-05-14 19:13:35.450686', '%H')
+    '19'
+    >>> _format_date_time('2019-05-14 19:13', '%H')
+    '19'
+    >>> _format_date_time('2019-05-14', '%Y')
+    '2019'
+    >>> _format_date_time('14/05/2018 19:13:35', '%H')
+    '19'
+    >>> _format_date_time('14/05/2018 19:13:35', '%H')
+    '19'
+    >>> _format_date_time('14/05/2019', '%Y')
+    '2019'
+    >>> _format_date_time('14/05/19', '%Y')
+    '2019'
+    >>> _format_date_time('19:13:35', '%H')
+    '19'
+    >>> _format_date_time('19:13', '%H')
+    '19'
+    """
     for f in DATE_TIME_FORMATS:
         try:
             return datetime.datetime.strptime(sdt, f).strftime(format)
@@ -177,6 +209,12 @@ def _format_date_time(sdt, format):
 
 
 def _int(v):
+    """
+    >>> _int('5')
+    5
+    >>> _int('Abacate')
+    nan
+    """
     try:
         return int(v)
     except Exception:
@@ -184,6 +222,12 @@ def _int(v):
 
 
 def _float(v):
+    """
+    >>> _float('5')
+    5.0
+    >>> _float('Abacate')
+    nan
+    """
     try:
         return float(v)
     except Exception:
@@ -208,6 +252,14 @@ def _uuid():
     return str(uuid.uuid4())
 
 
+def _selected(x, y):
+    """
+    >>> _selected("peixe abacate", "peixe")
+    True
+    """
+    return y in x
+
+
 FUNCTIONS = {
     "false": lambda: False,
     "true": lambda: True,
@@ -228,6 +280,7 @@ FUNCTIONS = {
     "substring_after": _substring_after,
     "substring_before": _substring_before,
     "uuid": _uuid,
+    "selected": _selected,
 }
 
 
@@ -276,9 +329,44 @@ def _lsp_atomize(tokens):
         return _lsp_atom(token)
 
 
-def _lsp_parse(program, data_node=""):
-    a = _lsp_atomize((program.replace(")", " ) ").replace("(", " ( ").split()))
+def _lsp_split_atomize(program):
+    string_delimiter = ''
+    atoms = []
+    atom = ''
+    program = program.replace(")", " ) ").replace("(", " ( ")
+    pl = len(program)
+    i = 0
+    while i < pl:
+        c = program[i]
+        if c not in ['"', "'"]:
+            if c == ' ':
+                atom_striped = atom.strip()
+                if atom_striped:
+                    atoms.append(atom_striped)
+                atom = ''
+            atom += c
+        else:
+            string_delimiter = c
+            i += 1
+            c = program[i]
+            atom += c
+            while c != string_delimiter:
+                i += 1
+                c = program[i]
+                if c not in ['"', "'"]:
+                    atom += c
+            i += 1
+            atom_striped = atom.strip()
+            if atom_striped:
+                atoms.append(atom_striped)
+            atom = ''
+        i += 1
 
+    return atoms
+
+
+def _lsp_parse(program, data_node=""):
+    a = _lsp_atomize(_lsp_split_atomize(program))
     if isinstance(data_node, str):
         data_node = XPathStr(data_node)
 
@@ -297,6 +385,13 @@ def _lisp(t):
     if "items" not in t:
         if t["val"] == "":
             return "''"
+
+        if t["type"] == "string":
+            if '"' in t["val"]:
+                return "'%s'" % t["val"]
+            else:
+                return '"%s"' % t["val"]
+
         return t["val"]
     args = "".join([" " + _lisp(tt) for tt in t["items"]])
     return "(" + t["val"] + args + ")"
