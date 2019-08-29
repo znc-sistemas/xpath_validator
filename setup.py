@@ -8,6 +8,7 @@ setup(
     long_description=open('README.rst').read(),
     author='Marcelo Fonseca Tambalo',
     author_email='marcelo.tambalo@nectosystems.com.br',
+    url='https://github.com/znc-sistemas/xpath_validator/',
     keywords=['XPath', ],
     license='MIT',
     classifiers=(
