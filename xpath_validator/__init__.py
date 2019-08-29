@@ -326,8 +326,8 @@ def _lsp_atom(token):
     <class 'xpath_validator.Function'>
     >>> type(_lsp_atom('peixe abacate'))
     <class 'xpath_validator.XPathStr'>
-    >>> type(_lsp_atom('5'))
-    <class 'float'>
+    >>> type(_lsp_atom('5')) == float
+    True
     '''
     try:
         return float(token)
