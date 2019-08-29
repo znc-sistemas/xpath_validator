@@ -108,7 +108,9 @@ False
 True
 >>> validate('(. div -5)', 10, returns_bool=False)
 -2.0
->>> validate("selected('peixe abacate', .)", 'peixe')
+>>> validate("selected('peixe abac\"ate', .)", 'peixe')
+True
+>>> validate("selected(\"peixe abac'ate\", .)", 'peixe')
 True
 >>> validate("selected('peixe abacate', 'peixe')", None)
 True
@@ -131,6 +133,10 @@ RETURNS_BOOL_AUTO = True
 
 
 class Symbol(str):
+    pass
+
+
+class Function(str):
     pass
 
 
@@ -235,6 +241,10 @@ def _float(v):
 
 
 def _substring_after(x, y):
+    '''
+    >>> _substring_after('abacate_laranja_maca', '_')
+    'laranja_maca'
+    '''
     for i in range(len(x)):
         if x[i] == y:
             return x[i + 1:]
@@ -242,6 +252,10 @@ def _substring_after(x, y):
 
 
 def _substring_before(x, y):
+    '''
+    >>> _substring_before('abacate_laranja_maca', '_')
+    'abacate'
+    '''
     for i in range(len(x)):
         if x[i] == y:
             return x[0:i]
@@ -303,17 +317,33 @@ ENV = {
 
 
 def _lsp_atom(token):
+    '''
+    >>> type(_lsp_atom('$'))
+    <class 'xpath_validator.Symbol'>
+    >>> type(_lsp_atom('boolean'))
+    <class 'xpath_validator.Function'>
+    >>> type(_lsp_atom('selected'))
+    <class 'xpath_validator.Function'>
+    >>> type(_lsp_atom('peixe abacate'))
+    <class 'xpath_validator.XPathStr'>
+    >>> type(_lsp_atom('5'))
+    <class 'float'>
+    '''
     try:
         return float(token)
     except ValueError:
         if token in FUNCTIONS.keys():
-            return token
+            return Function(token)
         if token in ENV.keys():
             return Symbol(token)
         return XPathStr(token)
 
 
 def _lsp_atomize(tokens):
+    '''
+    >>> _lsp_atomize(['(', '$', 'boolean', '(', '$', 'selected', 'peixe abacate', '.', ')', ')'])
+    ['$', 'boolean', ['$', 'selected', 'peixe abacate', '.']]
+    '''
     if len(tokens) == 0:
         raise SyntaxError("unexpected EOF")
     token = tokens.pop(0)
@@ -330,6 +360,10 @@ def _lsp_atomize(tokens):
 
 
 def _lsp_split_atomize(program):
+    '''
+    _lsp_split_atomize(' ( $ boolean  ( $ selected "peixe abacate" . )  ) ')
+    ['(', '$', 'boolean', '(', '$', 'selected', 'peixe abacate', '.', ')', ')']
+    '''
     string_delimiter = ''
     atoms = []
     atom = ''
@@ -361,11 +395,14 @@ def _lsp_split_atomize(program):
                 atoms.append(atom_striped)
             atom = ''
         i += 1
-
     return atoms
 
 
 def _lsp_parse(program, data_node=""):
+    '''
+    >>> _lsp_parse('($ boolean ($ selected "peixe abacate" .))', data_node="peixe")
+    ['$', 'boolean', ['$', 'selected', 'peixe abacate', 'peixe']]
+    '''
     a = _lsp_atomize(_lsp_split_atomize(program))
     if isinstance(data_node, str):
         data_node = XPathStr(data_node)
@@ -398,6 +435,10 @@ def _lisp(t):
 
 
 def _to_lsp(code, returns_bool):
+    '''
+    >>> _to_lsp("boolean(selected('peixe abacate', .))", True)
+    '($ boolean ($ selected "peixe abacate" .))'
+    '''
     if not code.startswith("boolean") and returns_bool:
         code = "boolean(%s)" % code
     tokens = tokenize(code)
@@ -406,6 +447,12 @@ def _to_lsp(code, returns_bool):
 
 
 def _xpath_boolean(x):
+    '''
+    >>> _xpath_boolean([Symbol('$'), Function('boolean'), [Symbol('$'), Function('selected'), XPathStr('peixe abacate'), XPathStr('peixe')]])
+    True
+    >>> _xpath_boolean([Symbol('$'), Function('boolean'), [Symbol('$'), Function('selected'), XPathStr('peixe abacate'), XPathStr('ola')]])
+    False
+    '''
     if isinstance(x, Symbol):
         return ENV[x]
     elif not isinstance(x, list):
@@ -415,6 +462,10 @@ def _xpath_boolean(x):
 
 
 def _prepare_ctx(ctx):
+    '''
+    >>> _prepare_ctx({'sep': '&'})
+    {'sep': "'&'"}
+    '''
     new_ctx = {}
     for d, v in ctx.items():
         if isinstance(v, str):
@@ -427,6 +478,10 @@ def _prepare_ctx(ctx):
 
 
 def _prepare_expression(exp, data):
+    '''
+    >>> _prepare_expression('. >= ${min} and . <= ${max}', {'max': 100, 'min': 10})
+    '. >= 10 and . <= 100'
+    '''
     exp = exp.replace("${", "{")
     exp = exp.format(**data)
     for func_name in FUNCTIONS.keys():
@@ -436,6 +491,10 @@ def _prepare_expression(exp, data):
 
 
 def validate(expression, data_node, context={}, returns_bool=RETURNS_BOOL_AUTO):
+    '''
+    >>> validate('. >= 10 and . <= 100', 10, {'max': 100, 'min': 10})
+    True
+    '''
     expression = _prepare_expression(expression, _prepare_ctx(context))
     lsp_code = _to_lsp(expression, returns_bool=returns_bool)
     lsp_parsed = _lsp_parse(lsp_code, data_node=data_node)

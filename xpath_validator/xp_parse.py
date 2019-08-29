@@ -6,6 +6,12 @@ from xpath_validator.xp_tokenize import clean, u_error
 
 
 def mktok(t, typ, val, itms=None):
+    '''
+    >>> t = {'from': (1, 8), 'type': 'symbol', 'val': '(', 'bp': 80, 'lbp': 70, 'led': call_led, 'nud': paren_nud}
+    >>> left = {'from': (1, 1), 'type': 'name', 'val': 'boolean', 'lbp': 0, 'nud': itself}
+    >>> mktok(t, "call", "$", [left]) == {'from': (1, 8), 'type': 'call', 'val': '$', 'items': [{'from': (1, 1), 'type': 'name', 'val': 'boolean', 'lbp': 0, 'nud': itself}]}
+    True
+    '''
     r = {"from": t["from"], "type": typ, "val": val}
     if itms is not None:
         r["items"] = itms
